@@ -67,4 +67,5 @@ yargs
       await redis.quit()
     },
   })
+  .demandCommand(1, '')
   .help().argv
