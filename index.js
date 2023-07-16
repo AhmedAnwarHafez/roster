@@ -13,19 +13,58 @@ if (!process.env.REDIS_URL) {
 
 const redis = new Redis(process.env.REDIS_URL)
 
+const getTeacherKeys = async () => {
+  return await redis.keys('teacher:*')
+}
+
+const getTeacherData = async (key) => {
+  return JSON.parse((await redis.get(key)) || '')
+}
+
+const printTeacherAvailability = (teacher) => {
+  console.log(`${teacher.availability ? '✅' : '❌'} ${teacher.name}`)
+}
+
+const updateTeacherAvailability = async (key, availability) => {
+  const teacher = await getTeacherData(key)
+  teacher.availability = availability
+  await redis.set(key, JSON.stringify(teacher))
+}
+
+const showTeacherAvailability = async () => {
+  const keys = await getTeacherKeys()
+  for (const key of keys.sort()) {
+    const teacher = await getTeacherData(key)
+    printTeacherAvailability(teacher)
+  }
+  await redis.quit()
+}
+
+const updateTeacher = async (name, availability, password) => {
+  const teacherKey = `teacher:${name}`
+  const teacher = await getTeacherData(teacherKey)
+  if (!teacher) {
+    console.log('Teacher not found')
+    return
+  }
+  if (teacher.password !== password) {
+    console.log('Invalid password')
+    return
+  }
+  await updateTeacherAvailability(teacherKey, availability)
+  console.log(
+    `${name} is now ${availability ? 'ON the floor' : 'OFF the floor'}`,
+  )
+
+  await redis.quit()
+}
+
 yargs
   .command({
     command: 'show',
     describe: 'Show teacher availability',
     handler: async () => {
-      const keys = await redis.keys('teacher:*')
-      for (const key of keys) {
-        const teacher = JSON.parse((await redis.get(key)) || '')
-        console.log(
-          `${teacher.availability === 'available' ? '✅' : '❌'} ${teacher}`,
-        )
-      }
-      await redis.quit()
+      await showTeacherAvailability()
     },
   })
   .command({
@@ -40,7 +79,7 @@ yargs
       availability: {
         describe: 'The availability of the teacher',
         demandOption: true,
-        type: 'string',
+        type: 'boolean',
       },
       password: {
         describe: 'The password of the teacher',
@@ -49,22 +88,7 @@ yargs
       },
     },
     handler: async (argv) => {
-      const teacherKey = `teacher:${argv.name}`
-      const teacherData = await redis.get(teacherKey)
-      if (!teacherData) {
-        console.log('Teacher not found')
-        return
-      }
-      const teacher = JSON.parse(teacherData)
-      if (teacher.password !== argv.password) {
-        console.log('Invalid password')
-        return
-      }
-      teacher.availability = argv.availability
-      await redis.set(teacherKey, JSON.stringify(teacher))
-      console.log('Availability updated')
-
-      await redis.quit()
+      await updateTeacher(argv.name, argv.availability, argv.password)
     },
   })
   .demandCommand(1, '')
