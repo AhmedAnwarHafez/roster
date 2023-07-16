@@ -2,6 +2,9 @@
 
 const yargs = require('yargs')
 const Redis = require('ioredis')
+const dotenv = require('dotenv')
+
+dotenv.config({ path: '~/.roster/.env' })
 
 if (!process.env.REDIS_URL) {
   console.log('Please set the REDIS_URL environment variable')
