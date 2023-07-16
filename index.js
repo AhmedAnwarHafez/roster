@@ -22,7 +22,7 @@ yargs
       for (const key of keys) {
         const teacher = JSON.parse((await redis.get(key)) || '')
         console.log(
-          `${teacher.name}: ${teacher.availability === '1' ? '✅' : '❌'}`,
+          `${teacher.availability === 'available' ? '✅' : '❌'} ${teacher}`,
         )
       }
       await redis.quit()
