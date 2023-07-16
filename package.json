@@ -1,5 +1,5 @@
 {
-  "name": "the-floor",
+  "name": "roster",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "start": "node index.js"
   },
   "bin": {
-    "floor": "./index.js"
+    "roster": "./index.js"
   },
   "keywords": [],
   "author": "",
