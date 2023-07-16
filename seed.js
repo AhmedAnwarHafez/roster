@@ -1,4 +1,7 @@
 const Redis = require('ioredis')
+const dotenv = require('dotenv')
+
+dotenv.config({ path: '~/.roster/.env' })
 
 if (!process.env.REDIS_URL) {
   console.log('Please set the REDIS_URL environment variable')
@@ -8,20 +11,20 @@ if (!process.env.REDIS_URL) {
 const redis = new Redis(process.env.REDIS_URL)
 
 const data = {
-  Teacher1: {
-    name: 'Teacher1',
+  ahmad: {
+    name: 'ahmad',
     availability: 'unavailable',
-    password: 'password1',
+    password: 'ahmad',
   },
-  Teacher2: {
-    name: 'Teacher2',
+  daph: {
+    name: 'daph',
     availability: 'unavailable',
-    password: 'password2',
+    password: 'daph',
   },
-  Teacher3: {
-    name: 'Teacher3',
+  jared: {
+    name: 'jared',
     availability: 'unavailable',
-    password: 'password3',
+    password: 'jared',
   },
 }
 
